@@ -7,6 +7,7 @@ import re
 import string
 import numpy as np
 import json
+import secrets
 from ciphers import CaesarCipher, VigenereCipher, SubstitutionCipher
 from analysis import FrequencyAnalysis, PatternAnalysis
 from utils import TextProcessor, FileHandler
@@ -15,7 +16,6 @@ from kryptos_visual import KryptosVisualizer, create_interactive_cipher_grid
 from database import DatabaseManager, initialize_k4_plaintext
 from key_testing import KeyTester
 from rate_limiter import show_rate_limit_status, check_and_enforce_rate_limit, force_session_refresh_if_expired
-import uuid
 
 def main():
     st.set_page_config(
@@ -35,7 +35,6 @@ def main():
     
     # Initialize session ID with secure random ID
     if 'session_id' not in st.session_state:
-        import secrets
         st.session_state.session_id = secrets.token_urlsafe(16)
     
     # Check session timeout before proceeding
@@ -56,7 +55,7 @@ def main():
         st.sidebar.write(f"**Session:** {st.session_state.session_id}")
         st.sidebar.write("🟢 Database connected")
         if st.sidebar.button("New Session"):
-            st.session_state.session_id = str(uuid.uuid4())[:8]
+            st.session_state.session_id = secrets.token_urlsafe(16)
             st.rerun()
     else:
         st.sidebar.write(f"**Session:** {st.session_state.session_id}")
@@ -644,7 +643,7 @@ def kryptos_analysis_page():
         st.write("**Interactive Cipher Grid:**")
         visualizer = KryptosVisualizer()
         interactive_fig = create_interactive_cipher_grid(kryptos.k4_ciphertext, kryptos.k4_known_positions)
-        st.plotly_chart(interactive_fig, use_container_width=True)
+        st.plotly_chart(interactive_fig, width="stretch")
         
         col_a, col_b = st.columns(2)
         with col_a:
@@ -748,7 +747,7 @@ def kryptos_analysis_page():
                     visualizer = KryptosVisualizer()
                     key_chart = visualizer.create_key_analysis_chart(vigenere_results)
                     if key_chart:
-                        st.plotly_chart(key_chart, use_container_width=True)
+                        st.plotly_chart(key_chart, width="stretch")
                     
                     best_key_lengths = sorted(vigenere_results.items(), 
                                             key=lambda x: x[1]['confidence'], reverse=True)[:5]
@@ -1085,7 +1084,7 @@ def database_history_page():
         if st.button("Clear Current Session"):
             if st.button("Confirm Clear Session", type="primary"):
                 # Note: We don't actually delete from DB, just start new session
-                st.session_state.session_id = str(uuid.uuid4())[:8]
+                st.session_state.session_id = secrets.token_urlsafe(16)
                 st.success("Started new session")
                 st.rerun()
 

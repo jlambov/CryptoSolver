@@ -1,3 +1,4 @@
+import math
 import re
 import string
 from typing import Dict, List, Optional
@@ -243,7 +244,7 @@ class StatisticalHelpers:
         for count in char_counts.values():
             probability = count / total_chars
             if probability > 0:
-                entropy -= probability * (probability.bit_length() - 1)
+                entropy -= probability * math.log2(probability)
         
         return entropy
     
